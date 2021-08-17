@@ -3,8 +3,14 @@ const fs = require('fs');
 const path = require("path");
 const convert = require('heic-convert');
 
-const convertImg = async (name) => {
-    const inputBuffer = await promisify(fs.readFile)('convert/'+name);
+/** program */
+//const program = require('commander'); 
+
+
+/** Fin program */
+
+const convertImg = async (name, pathOut) => {
+    const inputBuffer = await promisify(fs.readFile)(name);
     const images = await convert.all({
         buffer: inputBuffer, // the HEIC file buffer
         format: 'JPEG'       // output format
@@ -12,7 +18,8 @@ const convertImg = async (name) => {
     for (let idx in images) {
         const image = images[idx];
         const outputBuffer = await image.convert();
-        await promisify(fs.writeFile)(`./finalizado/${name}.jpg`, outputBuffer);
+        var nameFile = path.basename(name);
+        await promisify(fs.writeFile)(`${pathOut}/${nameFile}.jpg`, outputBuffer);
     }
 };
 
@@ -26,8 +33,8 @@ const getAllFiles = async function (dirPath, arrayOfFiles) {
         if (fs.statSync(dirPath + "/" + file).isDirectory()) {
             arrayOfFiles = getAllFiles(file, arrayOfFiles)
         } else {
-            //arrayOfFiles.push(path.join(dirPath, "/", file))
-            arrayOfFiles.push(file)
+            arrayOfFiles.push(path.join(dirPath, "/", file))
+            //arrayOfFiles.push(file)
         }
     })
 
@@ -35,13 +42,14 @@ const getAllFiles = async function (dirPath, arrayOfFiles) {
 }
 
 
-async function startConvertImg() {
+async function startConvertImg(pathIn, pathOut, ConvertFormat) {
     try {
-        const arrayFile = await getAllFiles('convert');
+        const arrayFile = await getAllFiles(pathIn);
         console.log(arrayFile);
+        console.log(" heic/jpg : " + ConvertFormat);
         let i = 0;
         do {
-            await convertImg(arrayFile[i])
+            await convertImg(arrayFile[i], pathOut)
                 .then(console.log(".... convitiendo " + arrayFile[i]))
                 .finally(console.log("Archivo " + arrayFile[i] + " finalizado correctamente"))
             i = i + 1;
@@ -57,4 +65,4 @@ async function startConvertImg() {
     ConvertFormat (1 = 'heic/png'|2 'jpg/heic'|3|4)    
 */
 
-startConvertImg()
+//startConvertImg('C:\\Users\\ADMIN\\Downloads\\convert', 'C:\\Users\\ADMIN\\Downloads\\finalizado', 1)
