@@ -4,8 +4,19 @@ const path = require("path");
 const convert = require('heic-convert');
 
 /** program */
-//const program = require('commander'); 
+const program = require('commander'); 
+program.version('0.0.1');
 
+program
+  .command('format')
+  .option("--input <pathin>", "specify folder")
+  .option("--output <pathou>", "specify folder")
+  .option("--format <number>", "input number")
+  .action(function (options) {
+      console.log(`<<path input : ${options.input} >> | << path output : ${options.output} >> | << format : ${options.format} >>`);
+      startConvertImg(options.input, options.output, options.format)
+  });
+program.parse(process.argv); 
 
 /** Fin program */
 
@@ -54,8 +65,8 @@ async function startConvertImg(pathIn, pathOut, ConvertFormat) {
                 .finally(console.log("Archivo " + arrayFile[i] + " finalizado correctamente"))
             i = i + 1;
         } while (i < arrayFile.length);
-    } catch (e) {
-        console.log(e);
+    } catch {
+        console.log("ERROR, revisa el comando --help");
     }
 }
 
